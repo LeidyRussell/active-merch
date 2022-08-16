@@ -96,7 +96,8 @@ module ActiveMerchant #:nodoc:
         config_error: 'config_error',
         test_mode_live_card: 'test_mode_live_card',
         unsupported_feature: 'unsupported_feature',
-        invalid_amount: 'invalid_amount'
+        invalid_amount: 'invalid_amount',
+        bad_transaction_reference: 'bad transaction reference'
       }
 
       cattr_reader :implementations
