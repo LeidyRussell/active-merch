@@ -5,6 +5,12 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
     @gateway = AwesomesauceGateway.new(merchant: 'test', secret: 'abc123')
 
     @amount = 100
+
+    @amount_card_invalid = 102
+    @amount_card_expired = 103
+    @amount_card_declined = 101
+    @amount_bad_transaction = 110
+    
     @credit_card = credit_card(number: '4111111111111111')
     @declined_card = credit_card(number: '4000300011112220')
     @invalid_card = credit_card(number: '123')
@@ -12,6 +18,9 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
 
     @options = {
       currency: 'USD'
+    }
+    @options_rejected_amount = {
+      amount: 102
     }
   end
 
@@ -44,14 +53,14 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
   end
 
   def test_failed_purchase
-    response = @gateway.purchase(@amount, @declined_card, @options)
+    response = @gateway.purchase(@amount_card_declined, @declined_card, @options)
     assert_failure response
     assert_equal false, response.params['succeeded']
     assert_equal Gateway::STANDARD_ERROR_CODE[:card_declined], response.error_code
   end
 
   def test_failed_purchase_with_invalid_number
-    response = @gateway.purchase(@amount, @invalid_card, @options)
+    response = @gateway.purchase(@amount_card_invalid, @invalid_card, @options)
     assert_failure response
     assert_equal false, response.params['succeeded']
     assert_equal Gateway::STANDARD_ERROR_CODE[:invalid_number], response.error_code
@@ -64,7 +73,7 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
   end
 
   def test_failed_authorize
-    response = @gateway.authorize(@amount, @declined_card, @options)
+    response = @gateway.authorize(@amount_card_declined, @declined_card, @options)
     assert_failure response
     assert_equal false, response.params['succeeded']
     assert_equal Gateway::STANDARD_ERROR_CODE[:card_declined], response.error_code
@@ -88,7 +97,7 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
   end
 
   def test_failed_capture
-    response = @gateway.capture(@amount, '')
+    response = @gateway.capture(@amount_bad_transaction, '')
     assert_failure response
     assert_equal false, response.params['succeeded']
     assert_equal Gateway::STANDARD_ERROR_CODE[:bad_transaction_reference], response.error_code
@@ -112,7 +121,7 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
   end
 
   def test_failed_refund
-    response = @gateway.refund(@amount, '')
+    response = @gateway.refund(@amount_card_expired, '')
     assert_failure response
     assert_equal false, response.params['succeeded']
   end
@@ -139,7 +148,7 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
   end
 
   def test_failed_verify
-    response = @gateway.verify(@declined_card, @options)
+    response = @gateway.verify(@declined_card, @options_rejected_amount)
     assert_failure response
     assert_equal false, response.params['succeeded']
   end
@@ -147,8 +156,9 @@ class RemoteAwesomesauceTest < Test::Unit::TestCase
   def test_invalid_login
     gateway = AwesomesauceGateway.new(merchant: '', secret: '')
 
-    response = gateway.purchase(@amount, @credit_card, @options)
-    assert_failure response
-    assert_equal false, response.params['succeeded']
+    authentication_exception = assert_raise ActiveMerchant::ResponseError, 'Failed with 401 Unauthorized' do
+      gateway.purchase(@amount, @credit_card, @options)
+    end
+    assert response = authentication_exception.response
   end
 end

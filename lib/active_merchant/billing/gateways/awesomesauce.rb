@@ -1,8 +1,8 @@
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     class AwesomesauceGateway < Gateway
-      self.test_url = 'https://awesomesauce-staging.herokuapp.com/api'
-      self.live_url = 'https://awesomesauce-staging.herokuapp.com/api'
+      self.test_url = 'https://awesomesauce-staging.herokuapp.com/api/'
+      self.live_url = 'https://awesomesauce-prod.herokuapp.com/api/'
 
       self.supported_countries = %w(US GB)
       self.default_currency = 'USD'
@@ -61,7 +61,7 @@ module ActiveMerchant #:nodoc:
       end
 
       def verify(credit_card, options = {})
-        amountToTest = 100
+        amountToTest = options[:amount] || 100
         MultiResponse.run(:use_first_response) do |r|
           r.process { authorize(amountToTest, credit_card, options) }
           r.process(:ignore_result) { void(r.authorization, options) }
@@ -74,7 +74,7 @@ module ActiveMerchant #:nodoc:
 
       def scrub(transcript)
         %w(number cv2 secret).each do |field|
-          transcript = transcript.gsub(%r((#{field}=)[^&]+), '\1[FILTERED]\2')
+          transcript = transcript.gsub(%r(("#{field}\\?"\s*:\s*\\?")[^"]*)i, '\1[FILTERED]')
         end
         transcript
       end
@@ -108,7 +108,8 @@ module ActiveMerchant #:nodoc:
 
       def commit(action, parameters)
         url = build_url(action, (test? ? test_url : live_url))
-        response = parse(ssl_post(url, post_data(action, parameters)))
+        post_data(parameters)
+        response = parse(ssl_post(url, parameters.to_json))
 
         Response.new(
           success_from(response),
@@ -123,7 +124,7 @@ module ActiveMerchant #:nodoc:
       end
 
       def build_url(action, base)
-        base + action
+        base + action + '.json'
       end
 
       def message_from(response)
@@ -138,10 +139,9 @@ module ActiveMerchant #:nodoc:
         response['id']
       end
 
-      def post_data(action, parameters = {})
+      def post_data(parameters = {})
         parameters[:merchant] = @options[:merchant]
         parameters[:secret] = @options[:secret]
-        parameters.collect { |k, v| "#{k}=#{v}" }.join('&')
       end
 
       def error_code_from(response)

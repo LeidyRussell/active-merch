@@ -151,42 +151,48 @@ class AwesomesauceTest < Test::Unit::TestCase
 
   def pre_scrubbed
     <<~PRE_SCRUBBED
-      opening connection to localhost:8080...
+      opening connection to awesomesauce-staging.herokuapp.com:443...
       opened
-      <- "POST /auth HTTP/1.1\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: close\r\nAccept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3\r\nAccept: */*\r\nUser-Agent: Ruby\r\nHost: localhost:8080\r\nContent-Length: 116\r\n\r\n"
-      <- "amount=1.00&currency=USD&name=Longbob Longsen&number=4111111111111111&cv2=123&exp=202309&secret=abc123&merchant=test"
+      starting SSL for awesomesauce-staging.herokuapp.com:443...
+      SSL established, protocol: TLSv1.2, cipher: ECDHE-RSA-AES128-GCM-SHA256
+      <- "POST /api/auth.json HTTP/1.1\r\nContent-Type: application/json\r\nConnection: close\r\nAccept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3\r\nAccept: */*\r\nUser-Agent: Ruby\r\nHost: awesomesauce-staging.herokuapp.com\r\nContent-Length: 133\r\n\r\n"
+      <- "{\"amount\":\"1.00\",\"name\":\"Longbob Longsen\",\"number\":\"4111111111111111\",\"cv2\":\"123\",\"exp\":\"202309\",\"merchant\":\"test\",\"secret\":\"abc123\"}"
       -> "HTTP/1.1 200 OK\r\n"
-      -> "X-Powered-By: Express\r\n"
-      -> "Content-Type: application/json; charset=utf-8\r\n"
-      -> "Content-Length: 55\r\n"
-      -> "ETag: W/\"37-44AKiLBypvxLhmFal1XDl2r5O7s\"\r\n"
-      -> "Date: Fri, 29 Jul 2022 04:41:42 GMT\r\n"
       -> "Connection: close\r\n"
+      -> "Server: Cowboy\r\n"
+      -> "Date: Mon, 22 Aug 2022 05:16:15 GMT\r\n"
+      -> "Content-Length: 54\r\n"
+      -> "Cache-Control: max-age=0, private, must-revalidate\r\n"
+      -> "Content-Type: application/json; charset=utf-8\r\n"
+      -> "Via: 1.1 vegur\r\n"
       -> "\r\n"
-      reading 55 bytes...
-      -> "{\"succeeded\":true,\"id\":\"authb1OwwNaJ\",\"amount\":\"10.00\"}"
-      read 55 bytes
+      reading 54 bytes...
+      -> "{\"succeeded\":true,\"id\":\"authrCYqrsXQ\",\"amount\":\"1.00\"}"
+      read 54 bytes
       Conn close
     PRE_SCRUBBED
   end
 
   def post_scrubbed
     <<~POST_SCRUBBED
-      opening connection to localhost:8080...
+      opening connection to awesomesauce-staging.herokuapp.com:443...
       opened
-      <- "POST /auth HTTP/1.1\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: close\r\nAccept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3\r\nAccept: */*\r\nUser-Agent: Ruby\r\nHost: localhost:8080\r\nContent-Length: 116\r\n\r\n"
-      <- "amount=1.00&currency=USD&name=Longbob Longsen&number=[FILTERED]&cv2=[FILTERED]&exp=202309&secret=[FILTERED]&merchant=test"
+      starting SSL for awesomesauce-staging.herokuapp.com:443...
+      SSL established, protocol: TLSv1.2, cipher: ECDHE-RSA-AES128-GCM-SHA256
+      <- "POST /api/auth.json HTTP/1.1\r\nContent-Type: application/json\r\nConnection: close\r\nAccept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3\r\nAccept: */*\r\nUser-Agent: Ruby\r\nHost: awesomesauce-staging.herokuapp.com\r\nContent-Length: 133\r\n\r\n"
+      <- "{\"amount\":\"1.00\",\"name\":\"Longbob Longsen\",\"number\":\"[FILTERED]\",\"cv2\":\"[FILTERED]\",\"exp\":\"202309\",\"merchant\":\"test\",\"secret\":\"[FILTERED]\"}"
       -> "HTTP/1.1 200 OK\r\n"
-      -> "X-Powered-By: Express\r\n"
-      -> "Content-Type: application/json; charset=utf-8\r\n"
-      -> "Content-Length: 55\r\n"
-      -> "ETag: W/\"37-44AKiLBypvxLhmFal1XDl2r5O7s\"\r\n"
-      -> "Date: Fri, 29 Jul 2022 04:41:42 GMT\r\n"
       -> "Connection: close\r\n"
+      -> "Server: Cowboy\r\n"
+      -> "Date: Mon, 22 Aug 2022 05:16:15 GMT\r\n"
+      -> "Content-Length: 54\r\n"
+      -> "Cache-Control: max-age=0, private, must-revalidate\r\n"
+      -> "Content-Type: application/json; charset=utf-8\r\n"
+      -> "Via: 1.1 vegur\r\n"
       -> "\r\n"
-      reading 55 bytes...
-      -> "{\"succeeded\":true,\"id\":\"authb1OwwNaJ\",\"amount\":\"10.00\"}"
-      read 55 bytes
+      reading 54 bytes...
+      -> "{\"succeeded\":true,\"id\":\"authrCYqrsXQ\",\"amount\":\"1.00\"}"
+      read 54 bytes
       Conn close
     POST_SCRUBBED
   end
